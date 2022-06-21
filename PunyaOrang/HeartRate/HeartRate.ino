@@ -135,6 +135,7 @@ String readPulseOximeter() {
 	{
 		myObject[i]["pulseOximeter"] = sensorNodes[i].pulseOximeter;
 	}
+	return  JSON.stringify(myObject);
 }
 String readTemperature() {
 	JSONVar myObject;
@@ -142,6 +143,7 @@ String readTemperature() {
 	{
 		myObject[i]["temperature"] = sensorNodes[i].temperature;
 	}
+	return  JSON.stringify(myObject);
 }
 
 //String readHeartRate(const uint32_t& from, const String& msg) {
