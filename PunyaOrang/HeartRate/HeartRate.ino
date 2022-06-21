@@ -35,12 +35,12 @@
 #define     TOTAL_SENSOR_DATA    20
 
 typedef struct {
-    int node;
-    unsigned long lastUpdate;
-    double temperature;
-    double heartRate;
-    double pulseOximeter;
-	
+	int node;
+	unsigned long lastUpdate;
+	double temperature;
+	double heartRate;
+	double pulseOximeter;
+
 } SensorNode;
 
 SensorNode sensorNodes[TOTAL_SENSOR_DATA];
@@ -61,87 +61,87 @@ IPAddress myAPIP(0, 0, 0, 0);
 
 
 SensorNode getNode(int nodeID) {
-    SensorNode result;
-	
-    if (lastNodeIdx == -1) {
-        // node array masih kosong, inisial node pertama
-        lastNodeIdx = 0;
-        result = sensorNodes[lastNodeIdx];
-    }
-    else {
-        for (uint8_t i = 0; i <= lastNodeIdx; i++)
-        {
-            if (sensorNodes[i].node == nodeID) {
+	SensorNode result;
+
+	if (lastNodeIdx == -1) {
+		// node array masih kosong, inisial node pertama
+		lastNodeIdx = 0;
+		result = sensorNodes[lastNodeIdx];
+	}
+	else {
+		for (uint8_t i = 0; i <= lastNodeIdx; i++)
+		{
+			if (sensorNodes[i].node == nodeID) {
 				result = sensorNodes[i];
-                return result;
+				return result;
 			}
-        }
+		}
 		// node tidak ditemukan, create node baru
-        if (lastNodeIdx < TOTAL_SENSOR_DATA - 1) {
-            lastNodeIdx++;
-            result = sensorNodes[lastNodeIdx];
-        }
-        else {
-            Serial.print("Sensor melebihi ");
-            Serial.println(TOTAL_SENSOR_DATA);
-        }
-    }
-    return result;
+		if (lastNodeIdx < TOTAL_SENSOR_DATA - 1) {
+			lastNodeIdx++;
+			result = sensorNodes[lastNodeIdx];
+		}
+		else {
+			Serial.print("Sensor melebihi ");
+			Serial.println(TOTAL_SENSOR_DATA);
+		}
+	}
+	return result;
 }
 
 void receivedCallback(const uint32_t& from, const String& msg) {
-    //Serial.printf("bridge: Received from %u msg=%s\n", from, msg.c_str());
-    JSONVar myObject = JSON.parse(msg.c_str());
-    int nodeId = myObject["node"];
-    double heartRate = myObject["heartRate"];
-    double pulseOximeter = myObject["pulseOximeter"];
-    double temperature = myObject["temperature"];
-    
-    SensorNode node = getNode(nodeId);
-    node.lastUpdate = millis();
-    node.heartRate = heartRate;
-    node.pulseOximeter = pulseOximeter;
-    node.temperature = temperature;
-	
-    Serial.print("Node : ");
-    Serial.println(nodeId);
-    // server.send(200, "text/html", index)
-    Serial.print("Heart Rate : ");
-    Serial.print(heartRate);
-    Serial.println(" bpm");
-    Serial.print("Pulse Oximeter : ");
-    Serial.print(pulseOximeter);
-    Serial.println(" %");
-    Serial.print("Temperature : ");
-    Serial.print(temperature);
-    Serial.println(" C");
+	//Serial.printf("bridge: Received from %u msg=%s\n", from, msg.c_str());
+	JSONVar myObject = JSON.parse(msg.c_str());
+	int nodeId = myObject["node"];
+	double heartRate = myObject["heartRate"];
+	double pulseOximeter = myObject["pulseOximeter"];
+	double temperature = myObject["temperature"];
+
+	SensorNode node = getNode(nodeId);
+	node.lastUpdate = millis();
+	node.heartRate = heartRate;
+	node.pulseOximeter = pulseOximeter;
+	node.temperature = temperature;
+
+	Serial.print("Node : ");
+	Serial.println(nodeId);
+	// server.send(200, "text/html", index)
+	Serial.print("Heart Rate : ");
+	Serial.print(heartRate);
+	Serial.println(" bpm");
+	Serial.print("Pulse Oximeter : ");
+	Serial.print(pulseOximeter);
+	Serial.println(" %");
+	Serial.print("Temperature : ");
+	Serial.print(temperature);
+	Serial.println(" C");
 }
 
 IPAddress getlocalIP() {
-    return IPAddress(mesh.getStationIP());
+	return IPAddress(mesh.getStationIP());
 }
 
 String readHeartRate() {
-    JSONVar myObject;
-    for (uint8_t i = 0; i <= lastNodeIdx; i++)
-    {
-        myObject[i]["heartRate"] = sensorNodes[i].heartRate;
-    }
-    return  JSON.stringify(myObject);
+	JSONVar myObject;
+	for (uint8_t i = 0; i <= lastNodeIdx; i++)
+	{
+		myObject[i]["heartRate"] = sensorNodes[i].heartRate;
+	}
+	return  JSON.stringify(myObject);
 }
 String readPulseOximeter() {
-    JSONVar myObject;
-    for (uint8_t i = 0; i <= lastNodeIdx; i++)
-    {
-        myObject[i]["pulseOximeter"] = sensorNodes[i].pulseOximeter;
-    }
+	JSONVar myObject;
+	for (uint8_t i = 0; i <= lastNodeIdx; i++)
+	{
+		myObject[i]["pulseOximeter"] = sensorNodes[i].pulseOximeter;
+	}
 }
 String readTemperature() {
-    JSONVar myObject;
-    for (uint8_t i = 0; i <= lastNodeIdx; i++)
-    {
-        myObject[i]["temperature"] = sensorNodes[i].temperature;
-    }
+	JSONVar myObject;
+	for (uint8_t i = 0; i <= lastNodeIdx; i++)
+	{
+		myObject[i]["temperature"] = sensorNodes[i].temperature;
+	}
 }
 
 //String readHeartRate(const uint32_t& from, const String& msg) {
@@ -163,49 +163,49 @@ String readTemperature() {
 //}
 
 void setup() {
-    Serial.begin(115200);
+	Serial.begin(115200);
 
-    mesh.setDebugMsgTypes(ERROR | STARTUP | CONNECTION);  // set before init() so that you can see startup messages
+	mesh.setDebugMsgTypes(ERROR | STARTUP | CONNECTION);  // set before init() so that you can see startup messages
 
-    // Channel set to 6. Make sure to use the same channel for your mesh and for you other
-    // network (STATION_SSID)
-    mesh.init(MESH_PREFIX, MESH_PASSWORD, MESH_PORT, WIFI_AP_STA, 11);
-    mesh.onReceive(&receivedCallback);
+	// Channel set to 6. Make sure to use the same channel for your mesh and for you other
+	// network (STATION_SSID)
+	mesh.init(MESH_PREFIX, MESH_PASSWORD, MESH_PORT, WIFI_AP_STA, 11);
+	mesh.onReceive(&receivedCallback);
 
-    mesh.stationManual(STATION_SSID, STATION_PASSWORD);
-    mesh.setHostname(HOSTNAME);
+	mesh.stationManual(STATION_SSID, STATION_PASSWORD);
+	mesh.setHostname(HOSTNAME);
 
-    // Bridge node, should (in most cases) be a root node. See [the wiki](https://gitlab.com/painlessMesh/painlessMesh/wikis/Possible-challenges-in-mesh-formation) for some background
-    mesh.setRoot(true);
-    // This node and all other nodes should ideally know the mesh contains a root, so call this on all nodes
-    mesh.setContainsRoot(true);
+	// Bridge node, should (in most cases) be a root node. See [the wiki](https://gitlab.com/painlessMesh/painlessMesh/wikis/Possible-challenges-in-mesh-formation) for some background
+	mesh.setRoot(true);
+	// This node and all other nodes should ideally know the mesh contains a root, so call this on all nodes
+	mesh.setContainsRoot(true);
 
-    myAPIP = IPAddress(mesh.getAPIP());
-    Serial.println("My AP IP is " + myAPIP.toString());
+	myAPIP = IPAddress(mesh.getAPIP());
+	Serial.println("My AP IP is " + myAPIP.toString());
 
-    // Route for root / web page
-    server.on("/", HTTP_GET, [](AsyncWebServerRequest* request) {
-        request->send(SPIFFS, "/index.html");
-    });
-    server.on("/heartrate", HTTP_GET, [](AsyncWebServerRequest* request) {
-        request->send(200, "text/plain", readHeartRate());
-    });
-    server.on("/pulseoximeter", HTTP_GET, [](AsyncWebServerRequest* request) {
-        request->send(200, "text/plain", readPulseOximeter());
-    });
-    server.on("/pulseoximeter", HTTP_GET, [](AsyncWebServerRequest* request) {
-        request->send(200, "text/plain", readTemperature());
-    });
+	// Route for root / web page
+	server.on("/", HTTP_GET, [](AsyncWebServerRequest* request) {
+		request->send(SPIFFS, "/index.html");
+		});
+	server.on("/heartrate", HTTP_GET, [](AsyncWebServerRequest* request) {
+		request->send(200, "text/plain", readHeartRate());
+		});
+	server.on("/pulseoximeter", HTTP_GET, [](AsyncWebServerRequest* request) {
+		request->send(200, "text/plain", readPulseOximeter());
+		});
+	server.on("/pulseoximeter", HTTP_GET, [](AsyncWebServerRequest* request) {
+		request->send(200, "text/plain", readTemperature());
+		});
 
-    // Start server
-    server.begin();
+	// Start server
+	server.begin();
 
 }
 
 void loop() {
-    mesh.update();
-    if (myIP != getlocalIP()) {
-        myIP = getlocalIP();
-        Serial.println("My IP is " + myIP.toString());
-    }
+	mesh.update();
+	if (myIP != getlocalIP()) {
+		myIP = getlocalIP();
+		Serial.println("My IP is " + myIP.toString());
+	}
 }
